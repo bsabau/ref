@@ -9,15 +9,25 @@ function urlBase64ToUint8Array(base64: string) {
   return Uint8Array.from([...raw].map((c) => c.charCodeAt(0)));
 }
 
-type State = "unsupported" | "off" | "on" | "busy" | "denied";
+function isStandalone(): boolean {
+  return (
+    window.matchMedia?.("(display-mode: standalone)").matches ||
+    (navigator as unknown as { standalone?: boolean }).standalone === true
+  );
+}
+
+type State = "unsupported" | "needs-install" | "off" | "on" | "busy" | "denied";
 
 export default function PushToggle() {
   const [state, setState] = useState<State>("busy");
+  const [hint, setHint] = useState(false);
 
   useEffect(() => {
     (async () => {
       if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
-        setState("unsupported");
+        // iOS Safari only exposes the Push API once the site is installed
+        // to the home screen — show the switch and explain instead of hiding.
+        setState(isStandalone() ? "unsupported" : "needs-install");
         return;
       }
       if (Notification.permission === "denied") {
@@ -31,6 +41,10 @@ export default function PushToggle() {
   }, []);
 
   async function toggle() {
+    if (state === "needs-install") {
+      setHint(true);
+      return;
+    }
     if (state !== "on" && state !== "off") return;
     setState("busy");
     try {
@@ -78,19 +92,39 @@ export default function PushToggle() {
       ? "Push notifications on — tap to disable"
       : state === "denied"
       ? "Notifications blocked in browser settings"
+      : state === "needs-install"
+      ? "Install the app to enable notifications"
       : "Enable push notifications (15 min before your starred bands)";
 
   return (
-    <button
-      onClick={toggle}
-      title={title}
-      aria-label={title}
-      role="switch"
-      aria-checked={state === "on"}
-      disabled={state === "busy" || state === "denied"}
-      className={`push-switch ${state === "on" ? "on" : ""}`}
-    >
-      {state === "on" ? "ON" : "OFF"}
-    </button>
+    <>
+      <button
+        onClick={toggle}
+        title={title}
+        aria-label={title}
+        role="switch"
+        aria-checked={state === "on"}
+        disabled={state === "busy" || state === "denied"}
+        className={`push-switch ${state === "on" ? "on" : ""}`}
+      >
+        {state === "on" ? "ON" : "OFF"}
+      </button>
+      {hint && (
+        <div className="install-hint" role="dialog" aria-label="How to install">
+          <strong>Install the app to get notifications</strong>
+          <ol>
+            <li>Open this site in Safari</li>
+            <li>
+              Tap the <span aria-hidden>⎋</span> Share button
+            </li>
+            <li>Choose “Add to Home Screen”, then Add</li>
+            <li>Open REF from your home screen and turn this switch on</li>
+          </ol>
+          <button className="btn" onClick={() => setHint(false)}>
+            Got it
+          </button>
+        </div>
+      )}
+    </>
   );
 }
