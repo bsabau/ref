@@ -1,0 +1,210 @@
+{
+  "festival": {
+    "name": "Rockstadt Extreme Fest",
+    "edition": "12th Edition",
+    "location": "Ghimbav, Romania",
+    "dates": "27-31 July 2026",
+    "startDate": "2026-07-27",
+    "endDate": "2026-07-31",
+    "stages": ["Adrian Rugina Stage", "Brasov Stage", "Andrei Calmuc Stage"]
+  },
+  "days": [
+    {
+      "day": 1,
+      "date": "2026-07-27",
+      "dayOfWeek": "Monday",
+      "stages": [
+        {
+          "stage": "Adrian Rugina Stage",
+          "bands": [
+            { "name": "Reverse The Moment", "start": "15:50", "end": "16:35" },
+            { "name": "Crowbar", "start": "17:30", "end": "18:15" },
+            { "name": "Heaven Shall Burn", "start": "19:15", "end": "20:15" },
+            { "name": "Sabaton", "start": "21:30", "end": "23:15", "headliner": true }
+          ]
+        },
+        {
+          "stage": "Brasov Stage",
+          "bands": [
+            { "name": "Implant Pentru Refuz", "start": "16:40", "end": "17:25" },
+            { "name": "Creeper", "start": "18:20", "end": "19:10" },
+            { "name": "Black Label Society", "start": "20:20", "end": "21:20" },
+            { "name": "Marilyn Manson", "start": "23:20", "end": "00:50", "headliner": true }
+          ]
+        },
+        {
+          "stage": "Andrei Calmuc Stage",
+          "bands": [
+            { "name": "Necrotted", "start": "15:10", "end": "15:55" },
+            { "name": "Groza", "start": "16:25", "end": "17:10" },
+            { "name": "Hackneyed", "start": "17:40", "end": "18:30" },
+            { "name": "Vended", "start": "19:00", "end": "20:00" },
+            { "name": "Majestica", "start": "20:30", "end": "21:30" },
+            { "name": "Alcest", "start": "22:00", "end": "23:00" },
+            { "name": "Death Angel", "start": "23:30", "end": "00:30" },
+            { "name": "Fu Manchu", "start": "01:00", "end": "02:00" }
+          ]
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "date": "2026-07-28",
+      "dayOfWeek": "Tuesday",
+      "stages": [
+        {
+          "stage": "Adrian Rugina Stage",
+          "bands": [
+            { "name": "Elder", "start": "15:50", "end": "16:35" },
+            { "name": "Bleed From Within", "start": "17:35", "end": "18:25" },
+            { "name": "Igorrr", "start": "19:25", "end": "20:25" },
+            { "name": "Hatebreed", "start": "21:35", "end": "22:35" },
+            { "name": "Godsmack", "start": "23:50", "end": "01:10", "headliner": true }
+          ]
+        },
+        {
+          "stage": "Brasov Stage",
+          "bands": [
+            { "name": "Rotheads", "start": "15:00", "end": "15:45" },
+            { "name": "Gutalax", "start": "16:40", "end": "17:30" },
+            { "name": "Orbit Culture", "start": "18:30", "end": "19:20" },
+            { "name": "Nevermore", "start": "20:30", "end": "21:30" },
+            { "name": "In Flames", "start": "22:40", "end": "23:45", "headliner": true }
+          ]
+        },
+        {
+          "stage": "Andrei Calmuc Stage",
+          "bands": [
+            { "name": "Employed To Serve", "start": "16:25", "end": "17:10" },
+            { "name": "Tribulation", "start": "17:40", "end": "18:30" },
+            { "name": "Cryptopsy", "start": "19:00", "end": "20:00" },
+            { "name": "Non Est Deus", "start": "20:30", "end": "21:30" },
+            { "name": "Immolation", "start": "22:00", "end": "23:00" },
+            { "name": "Deafheaven", "start": "23:30", "end": "00:30" },
+            { "name": "Grave", "start": "01:00", "end": "02:00" }
+          ]
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "date": "2026-07-29",
+      "dayOfWeek": "Wednesday",
+      "stages": [
+        {
+          "stage": "Adrian Rugina Stage",
+          "bands": [
+            { "name": "Allt", "start": "15:50", "end": "16:35" },
+            { "name": "Municipal Waste", "start": "17:35", "end": "18:25" },
+            { "name": "In Extremo", "start": "19:25", "end": "20:25" },
+            { "name": "Arch Enemy", "start": "21:35", "end": "22:35" },
+            { "name": "Lamb Of God", "start": "23:50", "end": "01:10", "headliner": true }
+          ]
+        },
+        {
+          "stage": "Brasov Stage",
+          "bands": [
+            { "name": "Underwaves", "start": "15:00", "end": "15:45" },
+            { "name": "Vader", "start": "16:40", "end": "17:30" },
+            { "name": "Thy Art Is Murder", "start": "18:30", "end": "19:20" },
+            { "name": "Accept", "start": "20:30", "end": "21:30" },
+            { "name": "Slaughter To Prevail", "start": "22:40", "end": "23:45", "headliner": true }
+          ]
+        },
+        {
+          "stage": "Andrei Calmuc Stage",
+          "bands": [
+            { "name": "Annisokay", "start": "16:25", "end": "17:10" },
+            { "name": "Novembers Doom", "start": "17:40", "end": "18:30" },
+            { "name": "Animals As Leaders", "start": "19:00", "end": "20:00" },
+            { "name": "The Ghost Inside", "start": "20:30", "end": "21:30" },
+            { "name": "Perturbator", "start": "22:00", "end": "23:00" },
+            { "name": "Candlemass", "start": "23:30", "end": "00:30" },
+            { "name": "Deicide", "start": "01:00", "end": "02:00" }
+          ]
+        }
+      ]
+    },
+    {
+      "day": 4,
+      "date": "2026-07-30",
+      "dayOfWeek": "Thursday",
+      "stages": [
+        {
+          "stage": "Adrian Rugina Stage",
+          "bands": [
+            { "name": "Raised By Owls", "start": "15:20", "end": "16:05" },
+            { "name": "Fit For An Autopsy", "start": "17:00", "end": "17:45" },
+            { "name": "Trooper", "start": "18:45", "end": "19:45" },
+            { "name": "Helloween", "start": "21:00", "end": "23:00", "headliner": true },
+            { "name": "Satyricon", "start": "00:10", "end": "01:10" }
+          ]
+        },
+        {
+          "stage": "Brasov Stage",
+          "bands": [
+            { "name": "Crippling Alcoholism", "start": "14:30", "end": "15:15" },
+            { "name": "Serrabulho", "start": "16:10", "end": "17:00" },
+            { "name": "Northlane", "start": "17:50", "end": "18:40" },
+            { "name": "Airbourne", "start": "19:50", "end": "20:55" },
+            { "name": "Amorphis", "start": "23:10", "end": "00:10" }
+          ]
+        },
+        {
+          "stage": "Andrei Calmuc Stage",
+          "bands": [
+            { "name": "Machukha", "start": "14:50", "end": "15:30" },
+            { "name": "Slow Crush", "start": "16:00", "end": "16:45" },
+            { "name": "Conservative Military Image", "start": "17:15", "end": "18:00" },
+            { "name": "Monolord", "start": "18:30", "end": "19:20" },
+            { "name": "Bucovina", "start": "19:50", "end": "20:40" },
+            { "name": "Malevolence", "start": "21:10", "end": "22:10" },
+            { "name": "Alexandra Capitanescu", "start": "22:40", "end": "23:40" },
+            { "name": "Coroner", "start": "00:10", "end": "01:10" },
+            { "name": "Wolves In The Throne Room", "start": "01:45", "end": "02:45" }
+          ]
+        }
+      ]
+    },
+    {
+      "day": 5,
+      "date": "2026-07-31",
+      "dayOfWeek": "Friday",
+      "stages": [
+        {
+          "stage": "Adrian Rugina Stage",
+          "bands": [
+            { "name": "Parnaie", "start": "15:00", "end": "15:45" },
+            { "name": "Decapitated", "start": "16:40", "end": "17:25" },
+            { "name": "Periphery", "start": "18:25", "end": "19:25" },
+            { "name": "Grandson", "start": "20:40", "end": "21:40" },
+            { "name": "The Prodigy", "start": "23:00", "end": "00:30", "headliner": true }
+          ]
+        },
+        {
+          "stage": "Brasov Stage",
+          "bands": [
+            { "name": "Signs Of The Swarm", "start": "15:50", "end": "16:35" },
+            { "name": "Feuerschwanz", "start": "17:30", "end": "18:20" },
+            { "name": "Carcass", "start": "19:30", "end": "20:35" },
+            { "name": "The Gathering", "start": "21:45", "end": "22:50" },
+            { "name": "Soulfly", "start": "00:40", "end": "01:40" }
+          ]
+        },
+        {
+          "stage": "Andrei Calmuc Stage",
+          "bands": [
+            { "name": "Heavy//Hitter", "start": "15:25", "end": "16:05" },
+            { "name": "Psychonaut", "start": "16:25", "end": "17:10" },
+            { "name": "Voivod", "start": "17:40", "end": "18:30" },
+            { "name": "Evergrey", "start": "19:00", "end": "20:00" },
+            { "name": "Left To Die", "start": "20:30", "end": "21:30" },
+            { "name": "HVNDS", "start": "22:00", "end": "23:00" },
+            { "name": "Insomnium", "start": "23:30", "end": "00:30" },
+            { "name": "Sventevith", "start": "01:00", "end": "02:00" }
+          ]
+        }
+      ]
+    }
+  ]
+}
