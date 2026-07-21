@@ -13,5 +13,5 @@ jobs:
     steps:
       - name: Trigger notification check
         run: |
-          curl -fsS -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+          curl -fsS -X POST -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             "${{ secrets.APP_URL }}/api/cron/notify"
