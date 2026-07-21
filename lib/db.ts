@@ -1,6 +1,14 @@
-import { neon } from "@neondatabase/serverless";
+import { neon, NeonQueryFunction } from "@neondatabase/serverless";
 
-export const sql = neon(process.env.DATABASE_URL!);
+type Sql = NeonQueryFunction<false, false>;
+let client: Sql | undefined;
+
+// Lazy: don't create the client at import time — Next evaluates route modules
+// while collecting page data at build, where DATABASE_URL may be absent.
+export const sql: Sql = ((...args: Parameters<Sql>) => {
+  client ??= neon(process.env.DATABASE_URL!);
+  return client(...args);
+}) as Sql;
 
 export interface PerformanceRow {
   id: number;
