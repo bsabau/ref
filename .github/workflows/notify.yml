@@ -1,0 +1,17 @@
+name: Push notification cron
+
+on:
+  schedule:
+    # every 5 minutes during festival week (25 Jul – 1 Aug 2026), UTC
+    - cron: "*/5 * 25-31 7 *"
+    - cron: "*/5 * 1 8 *"
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger notification check
+        run: |
+          curl -fsS -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.APP_URL }}/api/cron/notify"

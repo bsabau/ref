@@ -12,6 +12,16 @@ export const metadata: Metadata = {
   title: "Rockstadt Extreme Fest 2026",
   description:
     "Lineup, schedules and personal to-see lists for Rockstadt Extreme Fest 2026 — Ghimbav, Romania, 27-31 July.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "REF 2026",
+  },
+  icons: {
+    icon: "/icon-192.png",
+    apple: "/icon-192.png",
+  },
 };
 
 export const viewport: Viewport = {

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { PerformanceRow } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth";
+import PushToggle from "@/components/PushToggle";
 
 const STAGE_ORDER = ["Adrian Rugina Stage", "Brasov Stage", "Andrei Calmuc Stage"];
 const STAGE_COLOR: Record<string, string> = {
@@ -159,7 +160,11 @@ export default function Timetable({
     );
   }
 
-  const dayRows = rows.filter((r) => r.day_number === day && matches(r));
+  const searching = query.length > 0;
+  const dayRows = rows.filter((r) => r.day_number === day);
+  const searchResults = searching
+    ? rows.filter(matches).sort((a, b) => a.starts_at.localeCompare(b.starts_at))
+    : [];
   const mineFiltered = favRows
     .filter(matches)
     .sort((a, b) => a.starts_at.localeCompare(b.starts_at));
@@ -174,6 +179,7 @@ export default function Timetable({
           </div>
           <div className="userchip">
             <span>{user.name}</span>
+            <PushToggle />
             <button onClick={logout}>Log out</button>
           </div>
         </div>
@@ -199,7 +205,7 @@ export default function Timetable({
             placeholder="Search band or genre…"
             type="search"
           />
-          {view === "festival" && (
+          {view === "festival" && !searching && (
             <div className="tabs">
               {days.map((d) => (
                 <button
@@ -216,11 +222,33 @@ export default function Timetable({
         </div>
       </header>
 
-      {view === "festival" ? (
+      {view === "festival" && searching ? (
+        <main>
+          {searchResults.length === 0 ? (
+            <div className="empty">No band or genre matches “{q}”.</div>
+          ) : (
+            days.map((d) => {
+              const hits = searchResults.filter((r) => r.day_number === d.num);
+              if (hits.length === 0) return null;
+              return (
+                <section key={d.num}>
+                  <h2 className="day-heading">
+                    Day {d.num} · {d.dow} {d.date}
+                  </h2>
+                  <div className="cardlist">
+                    {hits.map((r) => (
+                      <Card key={r.id} r={r} showStage />
+                    ))}
+                  </div>
+                </section>
+              );
+            })
+          )}
+        </main>
+      ) : view === "festival" ? (
         <main className="day-layout cols">
           {STAGE_ORDER.map((stage) => {
             const stageRows = dayRows.filter((r) => r.stage === stage);
-            if (stageRows.length === 0 && query) return null;
             return (
               <section key={stage} className={`stage-${STAGE_COLOR[stage]}`}>
                 <div className="stage-head">{stage}</div>
@@ -234,9 +262,6 @@ export default function Timetable({
               </section>
             );
           })}
-          {query && dayRows.length === 0 && (
-            <div className="empty">Nothing on this day matches “{q}”.</div>
-          )}
         </main>
       ) : (
         <main>
