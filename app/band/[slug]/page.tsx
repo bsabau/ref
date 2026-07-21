@@ -64,25 +64,29 @@ export default async function BandPage({
 
       <div className="meta" style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 10 }}>
         {artist.genres.map((g) => (
-          <span key={g} className="chip">
+          <Link key={g} href={`/?q=${encodeURIComponent(g)}`} className="chip chip-link">
             {g}
-          </span>
+          </Link>
         ))}
       </div>
 
       {perf && (
         <div className={`slotbox card stage-${STAGE_COLOR[perf.stage] ?? "purple"}`} style={{ padding: "12px 8px 12px 14px" }}>
-          <div>
+          <Link
+            href={`/?day=${perf.day_number}&stage=${encodeURIComponent(perf.stage)}`}
+            className="slotbox-link"
+            title="Show this day and stage in the timetable"
+          >
             <div className="time">
               Day {perf.day_number} · {perf.day_of_week}
             </div>
             <div className="head-font" style={{ fontSize: 16, fontWeight: 600 }}>
-              {perf.stage}
+              {perf.stage} <span className="slot-chevron">›</span>
             </div>
             <div className="time">
               {fmtTime(perf.starts_at)} – {fmtTime(perf.ends_at)}
             </div>
-          </div>
+          </Link>
           <StarButton performanceId={perf.id} initial={favIds.includes(perf.id)} />
         </div>
       )}

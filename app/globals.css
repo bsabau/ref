@@ -253,6 +253,10 @@ a { color: inherit; text-decoration: none; }
 
 /* ---------- stages & cards ---------- */
 .day-layout { display: flex; flex-direction: column; gap: 18px; margin-top: 16px; }
+.day-layout section { scroll-margin-top: 250px; }
+@media (min-width: 1024px) {
+  .day-layout section { scroll-margin-top: 230px; }
+}
 @media (min-width: 1024px) {
   .day-layout.cols {
     display: grid;
@@ -470,6 +474,11 @@ a { color: inherit; text-decoration: none; }
   position: relative;
 }
 .slotbox .star-btn { position: static; transform: none; }
+.slotbox-link { flex: 1; display: block; }
+.slotbox-link:active { opacity: 0.7; }
+.slot-chevron { color: var(--muted); font-weight: 400; }
+.chip-link { cursor: pointer; }
+.chip-link:active, .chip-link:hover { border-color: var(--purple); color: var(--text); }
 .bio { margin-top: 18px; color: #d9d2e8; font-size: 15px; line-height: 1.65; }
 .bio p + p { margin-top: 12px; }
 .section-label {

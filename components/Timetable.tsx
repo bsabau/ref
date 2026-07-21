@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { PerformanceRow } from "@/lib/db";
@@ -15,6 +15,7 @@ const STAGE_COLOR: Record<string, string> = {
 };
 
 const fmtTime = (iso: string) => iso.slice(11, 16);
+const stageId = (stage: string) => `stage-${stage.toLowerCase().replace(/\s+/g, "-")}`;
 
 interface Clash {
   withBand: string;
@@ -26,10 +27,16 @@ export default function Timetable({
   user,
   rows,
   initialFavs,
+  initialDay,
+  initialStage,
+  initialQuery,
 }: {
   user: SessionUser;
   rows: PerformanceRow[];
   initialFavs: number[];
+  initialDay?: number;
+  initialStage?: string;
+  initialQuery?: string;
 }) {
   const router = useRouter();
   const days = useMemo(() => {
@@ -50,10 +57,31 @@ export default function Timetable({
     return match ? match.day_number : 1;
   }, [rows]);
 
+  const validInitialDay =
+    initialDay && rows.some((r) => r.day_number === initialDay)
+      ? initialDay
+      : undefined;
+
   const [view, setView] = useState<"festival" | "mine">("festival");
-  const [day, setDay] = useState(todayDefault);
-  const [q, setQ] = useState("");
+  const [day, setDay] = useState(validInitialDay ?? todayDefault);
+  const [q, setQ] = useState(initialQuery ?? "");
   const [favs, setFavs] = useState<Set<number>>(new Set(initialFavs));
+
+  // deep link from a band page: jump to the requested stage section
+  useEffect(() => {
+    if (!initialStage) return;
+    const el = document.getElementById(stageId(initialStage));
+    if (el) {
+      // instant jump, fired twice to outlast Next's post-navigation scroll reset
+      const jump = () => el.scrollIntoView({ block: "start" });
+      const t1 = setTimeout(jump, 100);
+      const t2 = setTimeout(jump, 600);
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
+    }
+  }, [initialStage]);
 
   async function toggleFav(id: number) {
     setFavs((prev) => {
@@ -250,7 +278,7 @@ export default function Timetable({
           {STAGE_ORDER.map((stage) => {
             const stageRows = dayRows.filter((r) => r.stage === stage);
             return (
-              <section key={stage} className={`stage-${STAGE_COLOR[stage]}`}>
+              <section key={stage} id={stageId(stage)} className={`stage-${STAGE_COLOR[stage]}`}>
                 <div className="stage-head">{stage}</div>
                 <div className="cardlist">
                   {stageRows.length === 0 ? (
