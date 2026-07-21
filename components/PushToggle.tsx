@@ -89,6 +89,8 @@ export default function PushToggle() {
       aria-checked={state === "on"}
       disabled={state === "busy" || state === "denied"}
       className={`push-switch ${state === "on" ? "on" : ""}`}
-    />
+    >
+      {state === "on" ? "ON" : "OFF"}
+    </button>
   );
 }
