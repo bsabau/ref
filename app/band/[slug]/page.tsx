@@ -81,7 +81,6 @@ export default async function BandPage({
             </div>
             <div className="time">
               {fmtTime(perf.starts_at)} – {fmtTime(perf.ends_at)}
-              {perf.is_headliner && " · headliner"}
             </div>
           </div>
           <StarButton performanceId={perf.id} initial={favIds.includes(perf.id)} />

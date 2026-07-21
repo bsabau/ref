@@ -122,10 +122,7 @@ export default function Timetable({
     const color = STAGE_COLOR[r.stage] ?? "purple";
     const myClashes = view === "mine" ? clashes.get(r.id) : undefined;
     return (
-      <Link
-        href={`/band/${r.slug}`}
-        className={`card stage-${color} ${r.is_headliner ? "headliner" : ""}`}
-      >
+      <Link href={`/band/${r.slug}`} className={`card stage-${color}`}>
         <div className="time">
           {fmtTime(r.starts_at)} – {fmtTime(r.ends_at)}
         </div>
