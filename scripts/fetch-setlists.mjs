@@ -238,8 +238,9 @@ async function apiGet(path) {
 }
 
 async function fetchViaApi(name) {
+  // Note: adding sort=relevance makes the API return 403 Forbidden.
   const search = await apiGet(
-    `/search/artists?artistName=${encodeURIComponent(name)}&p=1&sort=relevance`
+    `/search/artists?artistName=${encodeURIComponent(name)}&p=1`
   );
   const artists = search?.artist ?? [];
   if (artists.length === 0) return { miss: "artist not found" };
