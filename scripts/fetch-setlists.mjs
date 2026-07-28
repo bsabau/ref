@@ -51,6 +51,11 @@ const limit = Number(
   args.find((a) => a.startsWith("--limit="))?.slice("--limit=".length) ?? Infinity
 );
 
+// Lineup entries that aren't a plain artist name on setlist.fm.
+const NAME_OVERRIDES = {
+  "misthyrming-negral-perform-behemoths-sventevith": "Mísþyrming",
+};
+
 const USER_AGENT =
   "ref-festival-app/1.0 (personal festival companion; bogdan.sabau@gmail.com)";
 const DELAY_MS = 1200;
@@ -237,18 +242,8 @@ async function apiGet(path) {
   return res.json();
 }
 
-async function fetchViaApi(name) {
-  // Note: adding sort=relevance makes the API return 403 Forbidden.
-  const search = await apiGet(
-    `/search/artists?artistName=${encodeURIComponent(name)}&p=1`
-  );
-  const artists = search?.artist ?? [];
-  if (artists.length === 0) return { miss: "artist not found" };
-  const artist =
-    artists.find((a) => normalize(a.name) === normalize(name)) ?? artists[0];
-
-  const data = await apiGet(`/artist/${artist.mbid}/setlists?p=1`);
-  for (const s of data?.setlist ?? []) {
+function setlistFromApiData(setlists, matched) {
+  for (const s of setlists) {
     const [d, m, y] = s.eventDate.split("-"); // dd-MM-yyyy
     const date = `${y}-${m}-${d}`;
     if (date > today) continue;
@@ -272,7 +267,7 @@ async function fetchViaApi(name) {
       .filter(Boolean)
       .join(", ");
     return {
-      matched: artist.name,
+      matched,
       setlist: {
         url: s.url,
         event_date: date,
@@ -281,6 +276,52 @@ async function fetchViaApi(name) {
         songs,
       },
     };
+  }
+  return null;
+}
+
+async function fetchViaApi(name) {
+  // Note: adding sort=relevance makes the API return 403 Forbidden.
+  // Results are ordered by MusicBrainz sort name, so an exact match for a
+  // short name ("Vader") can sit pages behind partial matches ("Vader
+  // Abraham & …") — paginate until exact matches turn up.
+  let first = [];
+  const exact = [];
+  for (let p = 1; p <= 5; p++) {
+    const search = await apiGet(
+      `/search/artists?artistName=${encodeURIComponent(name)}&p=${p}`
+    );
+    const artists = search?.artist ?? [];
+    if (p === 1) first = artists;
+    exact.push(...artists.filter((a) => normalize(a.name) === normalize(name)));
+    if (exact.length || artists.length < (search?.itemsPerPage ?? 30)) break;
+  }
+  if (first.length === 0) return { miss: "artist not found" };
+
+  // MusicBrainz has duplicate artist names too. Try each same-named
+  // candidate; the real band is the one with by far the most setlists, so
+  // rank candidates by total count.
+  const candidates = (exact.length ? exact : first).slice(0, 10);
+  const ranked = [];
+  for (const artist of candidates) {
+    const page1 = await apiGet(`/artist/${artist.mbid}/setlists?p=1`);
+    if (page1?.setlist?.length) {
+      ranked.push({ artist, page1, total: page1.total ?? 0 });
+    }
+  }
+  ranked.sort((a, b) => b.total - a.total);
+
+  for (const { artist, page1, total } of ranked) {
+    // A page can be all future/empty entries (festival season), so look one
+    // page further before moving to the next candidate.
+    let found = setlistFromApiData(page1.setlist, artist.name);
+    if (!found && total > page1.setlist.length) {
+      const page2 = await apiGet(`/artist/${artist.mbid}/setlists?p=2`);
+      if (page2?.setlist?.length) {
+        found = setlistFromApiData(page2.setlist, artist.name);
+      }
+    }
+    if (found) return found;
   }
   return { miss: "no past setlist with songs" };
 }
@@ -299,12 +340,13 @@ await sql`
     fetched_at timestamptz NOT NULL DEFAULT now()
   )`;
 
+const onlySlugs = only ? only.split(",").map((s) => s.trim()) : null;
 const artists = await sql`
   SELECT a.id, a.slug, a.name
   FROM artists a
   LEFT JOIN artist_setlists s ON s.artist_id = a.id
   WHERE (${force} OR s.artist_id IS NULL)
-    AND (${only ?? null}::text IS NULL OR a.slug = ${only ?? null})
+    AND (${onlySlugs}::text[] IS NULL OR a.slug = ANY(${onlySlugs}))
   ORDER BY a.slug`;
 
 console.log(
@@ -317,9 +359,10 @@ let ok = 0;
 const misses = [];
 for (const artist of artists.slice(0, Number.isFinite(limit) ? limit : undefined)) {
   try {
+    const searchName = NAME_OVERRIDES[artist.slug] ?? artist.name;
     const result = apiKey
-      ? await fetchViaApi(artist.name)
-      : await fetchViaScrape(artist.name);
+      ? await fetchViaApi(searchName)
+      : await fetchViaScrape(searchName);
     if (result.miss) {
       misses.push(`${artist.slug}: ${result.miss}`);
       console.log(`  ✗ ${artist.slug} — ${result.miss}`);
