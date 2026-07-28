@@ -85,6 +85,35 @@ export async function getArtistPerformance(artistId: number) {
   }[];
 }
 
+export interface SetlistSong {
+  type: "song" | "label";
+  name: string;
+  info?: string;
+}
+
+export interface SetlistRow {
+  setlist_url: string;
+  event_date: string; // "YYYY-MM-DD"
+  venue: string | null;
+  tour: string | null;
+  songs: SetlistSong[];
+}
+
+export async function getArtistSetlist(
+  artistId: number
+): Promise<SetlistRow | null> {
+  try {
+    const rows = await sql`
+      SELECT setlist_url, event_date::text, venue, tour, songs
+      FROM artist_setlists WHERE artist_id = ${artistId}`;
+    return (rows[0] as SetlistRow) ?? null;
+  } catch {
+    // Table is created by scripts/fetch-setlists.mjs; a band page should
+    // still render if it hasn't been run against this database yet.
+    return null;
+  }
+}
+
 export async function getFavoriteIds(userId: number): Promise<number[]> {
   const rows = await sql`
     SELECT performance_id FROM favorites WHERE user_id = ${userId}`;

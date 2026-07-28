@@ -1,7 +1,12 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getUser } from "@/lib/auth";
-import { getArtist, getArtistPerformance, getFavoriteIds } from "@/lib/db";
+import {
+  getArtist,
+  getArtistPerformance,
+  getArtistSetlist,
+  getFavoriteIds,
+} from "@/lib/db";
 import StarButton from "@/components/StarButton";
 
 export const dynamic = "force-dynamic";
@@ -13,6 +18,13 @@ const STAGE_COLOR: Record<string, string> = {
 };
 
 const fmtTime = (iso: string) => iso.slice(11, 16);
+
+const fmtDate = (ymd: string) =>
+  new Date(`${ymd}T00:00:00`).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 
 function socialLabel(url: string): string {
   if (url.includes("facebook")) return "Facebook";
@@ -37,9 +49,10 @@ export default async function BandPage({
   const artist = await getArtist(slug);
   if (!artist) notFound();
 
-  const [perfs, favIds] = await Promise.all([
+  const [perfs, favIds, setlist] = await Promise.all([
     getArtistPerformance(artist.id),
     getFavoriteIds(user.id),
+    getArtistSetlist(artist.id),
   ]);
   const perf = perfs[0];
   const title = perf?.band_name ?? artist.name;
@@ -97,6 +110,43 @@ export default async function BandPage({
             <p key={i}>{p}</p>
           ))}
         </div>
+      )}
+
+      {setlist && (
+        <details className="setlist">
+          <summary>
+            <span className="section-label" style={{ margin: 0 }}>
+              Last show setlist
+            </span>
+            <span className="setlist-meta">
+              {fmtDate(setlist.event_date)}
+              {setlist.venue ? ` · ${setlist.venue}` : ""}
+            </span>
+          </summary>
+          {setlist.tour && <div className="setlist-tour">Tour: {setlist.tour}</div>}
+          <ol className="setlist-songs">
+            {setlist.songs.map((s, i) =>
+              s.type === "label" ? (
+                <li key={i} className="setlist-label" aria-hidden="true">
+                  {s.name}
+                </li>
+              ) : (
+                <li key={i}>
+                  {s.name}
+                  {s.info && <span className="setlist-info"> {s.info}</span>}
+                </li>
+              )
+            )}
+          </ol>
+          <a
+            className="setlist-source"
+            href={setlist.setlist_url}
+            target="_blank"
+            rel="noreferrer"
+          >
+            View on setlist.fm
+          </a>
+        </details>
       )}
 
       {artist.socials.length > 0 && (
