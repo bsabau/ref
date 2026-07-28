@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { PerformanceRow } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth";
 import PushToggle from "@/components/PushToggle";
+import { applyPendingFavorites, queueFavorite } from "@/lib/pendingFavorites";
 
 const STAGE_ORDER = ["Adrian Rugina Stage", "Brasov Stage", "Andrei Calmuc Stage"];
 const STAGE_COLOR: Record<string, string> = {
@@ -67,6 +68,12 @@ export default function Timetable({
   const [q, setQ] = useState(initialQuery ?? "");
   const [favs, setFavs] = useState<Set<number>>(new Set(initialFavs));
 
+  // Overlay toggles queued while offline. Done post-mount (not in the
+  // initial state) so hydration matches the server-rendered stars.
+  useEffect(() => {
+    setFavs((prev) => applyPendingFavorites(prev));
+  }, []);
+
   // deep link from a band page: jump to the requested stage section
   useEffect(() => {
     if (!initialStage) return;
@@ -84,24 +91,30 @@ export default function Timetable({
   }, [initialStage]);
 
   async function toggleFav(id: number) {
+    const desired = !favs.has(id);
     setFavs((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      if (desired) next.add(id);
+      else next.delete(id);
       return next;
     });
     try {
       const res = await fetch("/api/favorites", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ performanceId: id }),
+        body: JSON.stringify({ performanceId: id, favorited: desired }),
       });
-      if (!res.ok) throw new Error();
-    } catch {
-      // revert on failure
+      if (!res.ok) throw new Error("rejected");
+    } catch (err) {
+      if (err instanceof TypeError) {
+        // network failure (offline) — keep the star and sync when back online
+        queueFavorite(id, desired);
+        return;
+      }
+      // server rejected it — revert
       setFavs((prev) => {
         const next = new Set(prev);
-        if (next.has(id)) next.delete(id);
+        if (desired) next.delete(id);
         else next.add(id);
         return next;
       });
@@ -125,6 +138,27 @@ export default function Timetable({
     () => rows.filter((r) => favs.has(r.id)),
     [rows, favs]
   );
+
+  // Warm the service-worker cache with starred bands' pages and photos so
+  // "My list" details are browsable with no connection.
+  const warmed = useRef(new Set<string>());
+  useEffect(() => {
+    if (!("serviceWorker" in navigator) || !navigator.serviceWorker.controller)
+      return;
+    if (!navigator.onLine) return;
+    const t = setTimeout(() => {
+      for (const r of favRows) {
+        for (const u of [`/band/${r.slug}`, `/${r.local_image}`]) {
+          if (warmed.current.has(u)) continue;
+          warmed.current.add(u);
+          fetch(u, { credentials: "same-origin" }).catch(() => {
+            warmed.current.delete(u);
+          });
+        }
+      }
+    }, 2000);
+    return () => clearTimeout(t);
+  }, [favRows]);
 
   const clashes = useMemo(() => {
     const map = new Map<number, Clash[]>();

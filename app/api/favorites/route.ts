@@ -18,13 +18,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Bad performanceId" }, { status: 400 });
   }
 
-  const deleted = await sql`
-    DELETE FROM favorites
-    WHERE user_id = ${user.id} AND performance_id = ${performanceId}
-    RETURNING performance_id`;
+  // Optional explicit end state, so offline-queued toggles replay
+  // idempotently. Without it the request toggles, as before.
+  const desired =
+    typeof body.favorited === "boolean" ? (body.favorited as boolean) : null;
 
-  if (deleted.length > 0) {
+  if (desired === false) {
+    await sql`
+      DELETE FROM favorites
+      WHERE user_id = ${user.id} AND performance_id = ${performanceId}`;
     return NextResponse.json({ favorited: false });
+  }
+
+  if (desired === null) {
+    const deleted = await sql`
+      DELETE FROM favorites
+      WHERE user_id = ${user.id} AND performance_id = ${performanceId}
+      RETURNING performance_id`;
+
+    if (deleted.length > 0) {
+      return NextResponse.json({ favorited: false });
+    }
   }
 
   // FK on performance_id rejects ids that don't exist
