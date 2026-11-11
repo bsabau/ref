@@ -57,7 +57,8 @@ const NAME_OVERRIDES = {
 };
 
 const USER_AGENT =
-  "ref-festival-app/1.0 (personal festival companion; bogdan.sabau@gmail.com)";
+  loadEnv("SETLISTFM_USER_AGENT") ||
+  "ref-festival-app/1.0 (+https://github.com/bsabau/ref)";
 const DELAY_MS = 1200;
 const today = new Date().toISOString().slice(0, 10);
 

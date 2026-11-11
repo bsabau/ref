@@ -49,6 +49,21 @@ export function pendingStateFor(performanceId: number): boolean | undefined {
   return load()[String(performanceId)];
 }
 
+/** Drop any queued toggles and cached authenticated pages (e.g. on logout). */
+export async function clearClientSessionState(): Promise<void> {
+  save({});
+  if (typeof window !== "undefined" && "caches" in window) {
+    try {
+      const keys = await window.caches.keys();
+      await Promise.all(
+        keys.filter((k) => k.startsWith("ref-pages-")).map((k) => window.caches.delete(k))
+      );
+    } catch {
+      // ignore Cache API errors
+    }
+  }
+}
+
 let flushing = false;
 
 /** Try to sync every queued toggle; keeps entries that still fail. */

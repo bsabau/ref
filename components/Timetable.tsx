@@ -6,7 +6,11 @@ import { useRouter } from "next/navigation";
 import type { PerformanceRow } from "@/lib/db";
 import type { SessionUser } from "@/lib/auth";
 import PushToggle from "@/components/PushToggle";
-import { applyPendingFavorites, queueFavorite } from "@/lib/pendingFavorites";
+import {
+  applyPendingFavorites,
+  clearClientSessionState,
+  queueFavorite,
+} from "@/lib/pendingFavorites";
 
 const STAGE_ORDER = ["Adrian Rugina Stage", "Brasov Stage", "Andrei Calmuc Stage"];
 const STAGE_COLOR: Record<string, string> = {
@@ -123,6 +127,7 @@ export default function Timetable({
 
   async function logout() {
     await fetch("/api/logout", { method: "POST" });
+    await clearClientSessionState();
     router.push("/login");
     router.refresh();
   }

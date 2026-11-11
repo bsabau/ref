@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { clearClientSessionState } from "@/lib/pendingFavorites";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function LoginForm() {
         body: JSON.stringify({ name: name.trim(), create }),
       });
       if (res.ok) {
+        await clearClientSessionState();
         router.push("/");
         router.refresh();
         return;
